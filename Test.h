@@ -7,6 +7,8 @@ void matrix_multiply_test();
 
 void matrix_transpose_test();
 
+void matrix_multiplication_test();
+
 void test(Matrix *real, Matrix *expected, char *test_name);
 
 #endif

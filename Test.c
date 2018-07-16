@@ -7,6 +7,7 @@ int main() {
     matrix_set_test();
     matrix_multiply_test();
     matrix_transpose_test();
+    matrix_multiplication_test();
     
     return 0;
 }
@@ -43,6 +44,20 @@ void matrix_transpose_test() {
     set(1, c);
     transpose(a, &b);
     test(b, c, "Matrix transpose");
+}
+
+void matrix_multiplication_test() {
+    Matrix *a, *b, *c, *d;
+    create_matrix(3, 2, &a);
+    create_matrix(2, 3, &b);
+    create_matrix(3, 3, &c);
+    create_matrix(3, 3, &d);
+    
+    set(1, a);
+    set(-0.5, b);
+    set(-1, d);
+    matrix_multiplication(a, b, &c);
+    test(c, d, "Matrix multiplication");
 }
 
 void test(Matrix *real, Matrix *expected, char *test_name) {
