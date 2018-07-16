@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include "Matrix.h"
 
-void createMatrix(const unsigned int rows, const unsigned int columns, Matrix **result) {
+void createMatrix(const unsigned int rows, const unsigned int columns, Matrix **created) {
     Matrix *matrix = malloc(sizeof(Matrix));
     matrix->data = malloc(sizeof(float) * rows * columns);
     matrix->rows = rows;
     matrix->columns = columns;
-    *result = matrix;
+    *created = matrix;
 }
 
 void set(const float num, Matrix *matrix) {
@@ -28,15 +28,13 @@ void add(Matrix *matrix, const float num) {
             matrix->data[i * matrix->columns + j] += num;
 }
 
-unsigned int matrixAddition(const Matrix *a, const Matrix *b, Matrix **c) {
+unsigned int matrixAddition(const Matrix *a, Matrix *b) {
     if(a->rows != b->rows && a->columns != b->columns)
         return 0;
-    Matrix *matrix;
-    createMatrix(a->rows, a->columns, &matrix);
-    for(size_t i = matrix->rows; i--;)
-        for(size_t j = matrix->columns; j--;)
-                matrix->data[i * matrix->columns + j] = a->data[i * a->columns + j] + b->data[i * b->columns + j];
-    *c = matrix;
+    for(size_t i = a->rows; i--;) {
+        for(size_t j = a->columns; j--;)
+            b->data[i * a->columns + j] += a->data[i * a->columns + j];
+    }
     return 1;
 }
 
@@ -68,17 +66,18 @@ void transpose(const Matrix *a, Matrix **a_t) {
     createMatrix(a->columns, a->rows, &matrix);
     for(size_t i = matrix->rows; i--;)
         for(size_t j = matrix->columns; j--;)
-            matrix->data[i * matrix->columns + j] = a->data[j * a->columns + j];
+            matrix->data[i * matrix->columns + j] = a->data[j * a->columns + i];
     *a_t = matrix;
 }
 
-void print(const Matrix *matrix) {
+void printMatrix(const Matrix *matrix) {
     for(size_t i = matrix->rows; i--;) {
         for(size_t j = matrix->columns; j--;) {
-            printf("| %f ", matrix->data[i * matrix->columns + j]);
+            printf("| %7.4f ", matrix->data[i * matrix->columns + j]);
         }
-        printf("\n");
+        printf("|\n");
     }
+    printf("\n");
 }
 
 void freeMatrix(Matrix *matrix) {
