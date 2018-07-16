@@ -1,6 +1,9 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#define TRUE 1
+#define FALSE 0
+
 #define BLK_SIZE 128
 #define min(a, b) (a < b ? a : b)
 
@@ -10,7 +13,7 @@ typedef struct {
     unsigned int columns;
 } Matrix;
 
-void createMatrix(const unsigned int rows, const unsigned int columns, Matrix **created);
+void create_matrix(const unsigned int rows, const unsigned int columns, Matrix **created);
 
 void set(const float num, Matrix *matrix);
 
@@ -18,16 +21,18 @@ void randomize(const float min, const float max, Matrix *matrix);
 
 void add(Matrix *matrix, const float num);
 
-unsigned int matrixAddition(const Matrix *a, Matrix *b);
+unsigned int matrix_addition(const Matrix *a, Matrix *b);
 
 void multiply(Matrix *matrix, const float num);
 
-unsigned int matrixMultiplication(const Matrix *a, const Matrix *b, Matrix **c);
+unsigned int matrix_multiplication(const Matrix *a, const Matrix *b, Matrix **c);
 
 void transpose(const Matrix *a, Matrix **a_T);
 
-void printMatrix(const Matrix *matrix);
+void print_matrix(const Matrix *matrix);
 
-void freeMatrix(Matrix *matrix);
+void free_matrix(Matrix *matrix);
+
+unsigned int matrixes_equals(Matrix *first, Matrix *second);
 
 #endif

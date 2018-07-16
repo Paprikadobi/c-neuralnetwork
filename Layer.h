@@ -9,14 +9,14 @@ typedef struct {
     Matrix *biases;
 } Layer;
 
-void createLayer(const unsigned int inputs, const unsigned int outputs, Layer **created);
+void create_layer(const unsigned int inputs, const unsigned int outputs, Layer **created);
 
 void feed_forward(Layer *layer, Matrix *input, Matrix **output);
 
 void update(Layer *layer, Matrix **error);
 
-void printLayer(const Layer *layer, const unsigned int show_values);
+void print_layer(const Layer *layer, const unsigned int show_values);
 
-void freeLayer(Layer *layer);
+void free_layer(Layer *layer);
 
 #endif

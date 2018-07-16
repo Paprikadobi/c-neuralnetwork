@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "Matrix.h"
 
-void createMatrix(const unsigned int rows, const unsigned int columns, Matrix **created) {
+void create_matrix(const unsigned int rows, const unsigned int columns, Matrix **created) {
     Matrix *matrix = malloc(sizeof(Matrix));
     matrix->data = malloc(sizeof(float) * rows * columns);
     matrix->rows = rows;
@@ -28,14 +29,14 @@ void add(Matrix *matrix, const float num) {
             matrix->data[i * matrix->columns + j] += num;
 }
 
-unsigned int matrixAddition(const Matrix *a, Matrix *b) {
+unsigned int matrix_addition(const Matrix *a, Matrix *b) {
     if(a->rows != b->rows && a->columns != b->columns)
-        return 0;
+        return FALSE;
     for(size_t i = a->rows; i--;) {
         for(size_t j = a->columns; j--;)
             b->data[i * a->columns + j] += a->data[i * a->columns + j];
     }
-    return 1;
+    return TRUE;
 }
 
 void multiply(Matrix *matrix, const float num) {
@@ -44,11 +45,11 @@ void multiply(Matrix *matrix, const float num) {
             matrix->data[i * matrix->columns + j] *= num;
 }
 
-unsigned int matrixMultiplication(const Matrix *a, const Matrix *b, Matrix **c) {
+unsigned int matrix_multiplication(const Matrix *a, const Matrix *b, Matrix **c) {
     if(a->columns != b->rows)
-        return 0;
+        return FALSE;
     Matrix *matrix;
-    createMatrix(a->rows, b->columns, &matrix);
+    create_matrix(a->rows, b->columns, &matrix);
     set(0, matrix);
     for(size_t ii = 0; ii < matrix->rows; ii += BLK_SIZE)
         for(size_t jj = 0; jj < a->columns; jj += BLK_SIZE)
@@ -58,19 +59,19 @@ unsigned int matrixMultiplication(const Matrix *a, const Matrix *b, Matrix **c) 
                         for(size_t k = kk; k < min(b->columns, kk + BLK_SIZE); k++)
                             matrix->data[i * matrix->columns + k] += a->data[i * a->columns + j] * b->data[j * b->columns + k];
     *c = matrix;
-    return 1;
+    return TRUE;
 }
 
 void transpose(const Matrix *a, Matrix **a_t) {
     Matrix *matrix;
-    createMatrix(a->columns, a->rows, &matrix);
+    create_matrix(a->columns, a->rows, &matrix);
     for(size_t i = matrix->rows; i--;)
         for(size_t j = matrix->columns; j--;)
             matrix->data[i * matrix->columns + j] = a->data[j * a->columns + i];
     *a_t = matrix;
 }
 
-void printMatrix(const Matrix *matrix) {
+void print_matrix(const Matrix *matrix) {
     for(size_t i = matrix->rows; i--;) {
         for(size_t j = matrix->columns; j--;) {
             printf("| %7.4f ", matrix->data[i * matrix->columns + j]);
@@ -80,7 +81,19 @@ void printMatrix(const Matrix *matrix) {
     printf("\n");
 }
 
-void freeMatrix(Matrix *matrix) {
+void free_matrix(Matrix *matrix) {
     free(matrix->data);
     free(matrix);
+}
+
+unsigned int matrixes_equals(Matrix *first, Matrix *second) {
+    if(first->rows != second->rows || first->columns != second->columns)
+        return FALSE;
+    for(size_t i = first->rows; i--;) {
+        for(size_t j = first->columns; j--;) {
+            if(first->data[i * first->columns + j] != second->data[i * second->columns + j])
+                return FALSE;
+        }
+    }
+    return TRUE;
 }
