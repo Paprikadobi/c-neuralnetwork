@@ -17,8 +17,8 @@ void matrix_set_test() {
     create_matrix(3, 2, &a);
     create_matrix(3, 2, &b);
     
-    set(1, a);
     float data[6] = {1, 1, 1, 1, 1, 1};
+    set(data, a);
     b->data = data;
     test(a, b, "Matrix set");
 }
@@ -28,10 +28,12 @@ void matrix_multiply_test() {
     create_matrix(3, 2, &a);
     create_matrix(3, 2, &b);
     
-    set(1, a);
+    float data_a[6] = {1, 1, 1, 1, 1, 1};
+    float data_b[6] = {-1, -1, -1, -1, -1, -1};
+    
+    a->data = data_a;
+    b->data = data_b;
     multiply(a, -1);
-    float data[6] = {-1, -1, -1, -1, -1, -1};
-    b->data = data;
     test(a, b, "Matrix constant multiplication");
 }
 
@@ -40,8 +42,10 @@ void matrix_transpose_test() {
     create_matrix(3, 2, &a);
     create_matrix(2, 3, &c);
     
-    set(1, a);
-    set(1, c);
+    float data[6] = {1, 1, 1, 1, 1, 1};
+    
+    a->data = data;
+    c->data = data;
     transpose(a, &b);
     test(b, c, "Matrix transpose");
 }
@@ -50,12 +54,15 @@ void matrix_multiplication_test() {
     Matrix *a, *b, *c, *d;
     create_matrix(3, 2, &a);
     create_matrix(2, 3, &b);
-    create_matrix(3, 3, &c);
     create_matrix(3, 3, &d);
     
-    set(1, a);
-    set(-0.5, b);
-    set(-1, d);
+    float data_a[6] = {1, 1, 1, 1, 1, 1};
+    float data_b[6] = {-0.5, -0.5, -0.5, -0.5, -0.5, -0.5};
+    float data_d[9] = {-1, -1, -1, -1, -1, -1, -1, -1, -1};
+    
+    a->data = data_a;
+    b->data = data_b;
+    d->data = data_d;
     matrix_multiplication(a, b, &c);
     test(c, d, "Matrix multiplication");
 }

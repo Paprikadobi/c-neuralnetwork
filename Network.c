@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "Matrix.h"
+#include "Data.h"
 #include "Layer.h"
 #include "Network.h"
 
@@ -11,7 +12,7 @@ void create_network(const unsigned int layers_number, const unsigned int *layers
     network->layers = malloc(sizeof(Layer) * layers_number);
     network->learning_rate = learning_rate;
     for(size_t i = layers_number; i--;) {
-        create_layer(layers_neurons[i], layers_neurons[i + 1], &(network->layers[i]));
+        create_layer(layers_neurons[i], layers_neurons[i + 1], sigmoid, d_sigmoid, &(network->layers[i]));
     }
     *created = network;
 }
@@ -22,18 +23,24 @@ void network_feed_forward(const Network *network, Matrix *input, Matrix **output
         feed_forward(network->layers[i], input, &tmp);
         input = tmp;
     }
-    *output = tmp;
+    copy(tmp, output);
 }
 
-void train(Network *network, Matrix *input, Matrix *output) {
-    Matrix *guess, *error;
-    network_feed_forward(network, input, &guess);
-    multiply(guess, -1);
-    error = guess;
-    matrix_addition(output, error);
-    multiply(error, network->learning_rate);
-   for(size_t i = network->layers_number; i--;) {
-        update(network->layers[i], &error);
+void train(Network *network, const Data *training_data) {
+    Matrix **inputs = training_data->x;
+    Matrix **outputs = training_data->y;
+    float *data = malloc(sizeof(float) * outputs[0]->rows);
+    for(size_t i = outputs[0]->rows; i--;)
+        data[i] = 0;
+    for(size_t i = training_data->count; i--;) {
+        Matrix *guess_error;
+        network_feed_forward(network, inputs[i], &guess_error);
+        multiply(guess_error, -1);
+        matrix_addition(outputs[i], guess_error);
+        multiply(guess_error, network->learning_rate);
+        for(size_t j = network->layers_number; j--;)
+            update(network->layers[j], &guess_error);
+        free_matrix(guess_error);
     }
 }
 

@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TRUE 1
+#define FALSE 0
+
 #include "Matrix.h"
 
 void create_matrix(const unsigned int rows, const unsigned int columns, Matrix **created) {
@@ -11,10 +14,10 @@ void create_matrix(const unsigned int rows, const unsigned int columns, Matrix *
     *created = matrix;
 }
 
-void set(const float num, Matrix *matrix) {
+void set(const float *nums, Matrix *matrix) {
     for(size_t i = matrix->rows; i--;)
         for(size_t j = matrix->columns; j--;)
-            matrix->data[i * matrix->columns + j] = num;
+            matrix->data[i * matrix->columns + j] = nums[i * matrix->columns + j];
 }
 
 void randomize(const float min, const float max, Matrix *matrix) {
@@ -45,12 +48,24 @@ void multiply(Matrix *matrix, const float num) {
             matrix->data[i * matrix->columns + j] *= num;
 }
 
+unsigned int matrix_mult(Matrix *a, const Matrix *b) {
+    if(a->rows != b->rows && a->columns != b->columns)
+        return FALSE;
+    for(size_t i = a->rows; i--;)
+        for(size_t j = a->columns; j--;)
+            a->data[i * a->columns + j] *= b->data[i * a->columns + j];
+    return TRUE;
+}
+
 unsigned int matrix_multiplication(const Matrix *a, const Matrix *b, Matrix **c) {
     if(a->columns != b->rows)
         return FALSE;
     Matrix *matrix;
     create_matrix(a->rows, b->columns, &matrix);
-    set(0, matrix);
+    float *data = malloc(sizeof(float) * a->rows * b->columns);
+    for(size_t i = a->rows * b->columns; i--;)
+        data[i] = 0;
+    set(data, matrix);
     for(size_t ii = 0; ii < matrix->rows; ii += BLK_SIZE)
         for(size_t jj = 0; jj < a->columns; jj += BLK_SIZE)
             for(size_t kk = 0; kk < b->columns; kk += BLK_SIZE)
@@ -71,7 +86,21 @@ void transpose(const Matrix *a, Matrix **a_t) {
     *a_t = matrix;
 }
 
+void map(Matrix *matrix, float (*function)(float)) {
+    for(size_t i = matrix->rows; i--;)
+        for(size_t j = matrix->columns; j--;)
+            matrix->data[i * matrix->columns + j] = function(matrix->data[i * matrix->columns + j]);
+}
+
+void copy(const Matrix *a, Matrix **created) {
+    Matrix *matrix;
+    create_matrix(a->rows, a->columns, &matrix);
+    set(a->data, matrix);
+    *created = matrix;
+}
+
 void print_matrix(const Matrix *matrix) {
+    printf("%d x %d\n", matrix->rows, matrix->columns);
     for(size_t i = matrix->rows; i--;) {
         for(size_t j = matrix->columns; j--;) {
             printf("| %7.4f ", matrix->data[i * matrix->columns + j]);

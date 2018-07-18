@@ -1,17 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "Matrix.h"
 #include "Layer.h"
 
-void create_layer(const unsigned int inputs, const unsigned int outputs, Layer **created) {
+void create_layer(const unsigned int inputs, const unsigned int outputs, float (*activation)(float), float (*derivative)(float), Layer **created) {
     Layer *layer = malloc(sizeof(Layer));
     layer->inputs = inputs;
     layer->outputs = outputs;
+    layer->activation = activation;
+    layer->derivative = derivative;
     create_matrix(outputs, inputs, &(layer->weights));
     create_matrix(outputs, 1, &(layer->biases));
-    randomize(-1, 1, layer->weights);
-    randomize(-1, 1, layer->biases);
+    randomize(-0.1, 0.1, layer->weights);
+    randomize(-0.1, 0.1, layer->biases);
     *created = layer;
 }
 
@@ -20,17 +23,21 @@ void feed_forward(Layer *layer, Matrix *input, Matrix **output) {
     layer->input = input;
     matrix_multiplication(layer->weights, input, &result);
     matrix_addition(layer->biases, result);
+    map(result, layer->activation);
+    layer->a = result;
     *output = result;
 }
 
 void update(Layer *layer, Matrix **error) {
     Matrix *input_T, *delta_W, *weights_T, *new_error;
+    map(layer->a, layer->derivative);
+    matrix_mult(*error, layer->a);
+    transpose(layer->weights, &weights_T);
+    matrix_multiplication(weights_T, *error, &new_error);
     transpose(layer->input, &input_T);
     matrix_multiplication(*error, input_T, &delta_W);
     matrix_addition(delta_W, layer->weights);
     matrix_addition(*error, layer->biases);
-    transpose(layer->weights, &weights_T);
-    matrix_multiplication(weights_T, *error, &new_error);
     
     free_matrix(*error);
     free_matrix(input_T);
@@ -54,4 +61,12 @@ void free_layer(Layer *layer) {
     free_matrix(layer->weights);
     free_matrix(layer->biases);
     free(layer);
+}
+
+float sigmoid(const float x) {
+    return 1.0 / (1.0 + exp(-x));
+}
+
+float d_sigmoid(const float x) {
+    return x * (1.0 - x);
 }
