@@ -66,6 +66,7 @@ unsigned int matrix_multiplication(const Matrix *a, const Matrix *b, Matrix **c)
     for(size_t i = a->rows * b->columns; i--;)
         data[i] = 0;
     set(data, matrix);
+    free(data);
     for(size_t ii = 0; ii < matrix->rows; ii += BLK_SIZE)
         for(size_t jj = 0; jj < a->columns; jj += BLK_SIZE)
             for(size_t kk = 0; kk < b->columns; kk += BLK_SIZE)

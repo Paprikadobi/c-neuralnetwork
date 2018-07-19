@@ -19,21 +19,21 @@ void create_network(const unsigned int layers_number, const unsigned int *layers
 
 void network_feed_forward(const Network *network, Matrix *input, Matrix **output) {
     Matrix *tmp;
+    Matrix *inp;
+    copy(input, &inp);
     for(size_t i = 0; i < network->layers_number; i++) {
-        feed_forward(network->layers[i], input, &tmp);
-        input = tmp;
+        feed_forward(network->layers[i], inp, &tmp);
+        inp = tmp;
     }
-    copy(tmp, output);
+    *output = tmp;
 }
 
 void train(Network *network, const Data *training_data) {
     Matrix **inputs = training_data->x;
     Matrix **outputs = training_data->y;
-    float *data = malloc(sizeof(float) * outputs[0]->rows);
-    for(size_t i = outputs[0]->rows; i--;)
-        data[i] = 0;
+    Matrix *guess_error;
+    printf("Training\n");
     for(size_t i = training_data->count; i--;) {
-        Matrix *guess_error;
         network_feed_forward(network, inputs[i], &guess_error);
         multiply(guess_error, -1);
         matrix_addition(outputs[i], guess_error);
@@ -42,6 +42,7 @@ void train(Network *network, const Data *training_data) {
             update(network->layers[j], &guess_error);
         free_matrix(guess_error);
     }
+    printf("Training ended\n");
 }
 
 void print_network(const Network *network, const unsigned int show_values) {

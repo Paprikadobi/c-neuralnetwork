@@ -11,21 +11,27 @@ void create_layer(const unsigned int inputs, const unsigned int outputs, float (
     layer->outputs = outputs;
     layer->activation = activation;
     layer->derivative = derivative;
+    layer->input = NULL;
+    layer->a = NULL;
     create_matrix(outputs, inputs, &(layer->weights));
     create_matrix(outputs, 1, &(layer->biases));
-    randomize(-0.1, 0.1, layer->weights);
-    randomize(-0.1, 0.1, layer->biases);
+    randomize(-1, 1, layer->weights);
+    randomize(-1, 1, layer->biases);
     *created = layer;
 }
 
 void feed_forward(Layer *layer, Matrix *input, Matrix **output) {
     Matrix *result;
+    if(layer->input)
+        free_matrix(layer->input);
     layer->input = input;
     matrix_multiplication(layer->weights, input, &result);
     matrix_addition(layer->biases, result);
     map(result, layer->activation);
+    if(layer->a)
+        free_matrix(layer->a);
     layer->a = result;
-    *output = result;
+    copy(result, output);
 }
 
 void update(Layer *layer, Matrix **error) {
