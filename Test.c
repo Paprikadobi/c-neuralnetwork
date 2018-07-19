@@ -18,7 +18,7 @@ void matrix_set_test() {
     create_matrix(3, 2, &b);
     
     float data[6] = {1, 1, 1, 1, 1, 1};
-    set(data, a);
+    set(1, a);
     b->data = data;
     test(a, b, "Matrix set");
 }

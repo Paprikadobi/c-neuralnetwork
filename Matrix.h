@@ -12,7 +12,7 @@ typedef struct {
 
 void create_matrix(const unsigned int rows, const unsigned int columns, Matrix **created);
 
-void set(const float *nums, Matrix *matrix);
+void set(const float num, Matrix *matrix);
 
 void randomize(const float min, const float max, Matrix *matrix);
 
@@ -25,6 +25,8 @@ void multiply(Matrix *matrix, const float num);
 unsigned int matrix_mult(Matrix *a, const Matrix *b);
 
 unsigned int matrix_multiplication(const Matrix *a, const Matrix *b, Matrix **c);
+
+void filter_matrix(Matrix *matrix, const Matrix *filter);
 
 void transpose(const Matrix *a, Matrix **a_T);
 
