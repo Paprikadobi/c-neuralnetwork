@@ -46,8 +46,9 @@ void train(Network *network, const Data *training_data) {
 }
 
 void print_network(const Network *network, const unsigned int show_values) {
+    printf("Learning rate: %.3f\n\n", network->learning_rate);
     for(size_t i = 0; i < network->layers_number; i++) {
-        printf("Layer %zu: \n\n", i);
+        printf("Layer %zu: \n", i);
         print_layer(network->layers[i], show_values);
     }
 }

@@ -26,7 +26,9 @@ unsigned int matrix_mult(Matrix *a, const Matrix *b);
 
 unsigned int matrix_multiplication(const Matrix *a, const Matrix *b, Matrix **c);
 
-void filter_matrix(Matrix *matrix, const Matrix *filter);
+unsigned int reshape(Matrix *matrix, const unsigned int rows, const unsigned int columns);
+
+void filter_matrix(const Matrix *matrix, const Matrix *filter, Matrix **created);
 
 void transpose(const Matrix *a, Matrix **a_T);
 

@@ -74,12 +74,24 @@ unsigned int matrix_multiplication(const Matrix *a, const Matrix *b, Matrix **c)
     return TRUE;
 }
 
-void filter_matrix(Matrix *matrix, const Matrix *filter) {
-    for(size_t i = 0; i < matrix->rows; i += filter->rows)
-        for(size_t j = 0; j < matrix->columns; j += filter->columns)
+unsigned int reshape(Matrix *matrix, const unsigned int rows, const unsigned int columns) {
+    if(matrix->rows * matrix->columns / rows != columns)
+        return FALSE;
+    matrix->rows = rows;
+    matrix->columns = columns;
+    return TRUE;
+}
+
+void filter_matrix(const Matrix *matrix, const Matrix *filter, Matrix **created) {
+    Matrix *result;
+    create_matrix(matrix->rows, matrix->columns, &result);
+    set(0, result);
+    for(size_t i = 0; i < matrix->rows - filter->rows; i++)
+        for(size_t j = 0; j < matrix->columns; j++)
             for(size_t k = filter->rows; k--;)
                 for(size_t l = filter->columns; l--;)
-                    matrix->data[(i + k) * matrix->columns + j + l] *= filter->data[k * filter->columns + l];
+                    result->data[i * result->columns + j] += matrix->data[(i + k) * matrix->columns + j + l] * filter->data[k * filter->columns + l];
+    *created = result;
 }
 
 void transpose(const Matrix *a, Matrix **a_t) {
