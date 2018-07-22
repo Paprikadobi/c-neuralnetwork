@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "ActivationFunctions.h"
 #include "Matrix.h"
 #include "Data.h"
 #include "Layer.h"

@@ -22,8 +22,4 @@ void print_layer(const Layer *layer, const unsigned int show_values);
 
 void free_layer(Layer *layer);
 
-float sigmoid(const float x);
-
-float d_sigmoid(const float x);
-
 #endif

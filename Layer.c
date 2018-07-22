@@ -68,11 +68,3 @@ void free_layer(Layer *layer) {
     free_matrix(layer->biases);
     free(layer);
 }
-
-float sigmoid(const float x) {
-    return 1.0 / (1.0 + exp(-x));
-}
-
-float d_sigmoid(const float x) {
-    return x * (1.0 - x);
-}

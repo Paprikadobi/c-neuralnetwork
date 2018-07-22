@@ -120,8 +120,8 @@ void copy(const Matrix *a, Matrix **created) {
 
 void print_matrix(const Matrix *matrix) {
     printf("%d x %d\n", matrix->rows, matrix->columns);
-    for(size_t i = matrix->rows; i--;) {
-        for(size_t j = matrix->columns; j--;) {
+    for(size_t i = 0; i < matrix->rows; i++) {
+        for(size_t j = 0; j < matrix->columns; j++) {
             printf("| %7.4f ", matrix->data[i * matrix->columns + j]);
         }
         printf("|\n");
