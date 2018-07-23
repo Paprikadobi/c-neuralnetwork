@@ -31,9 +31,9 @@ void create_fully_connected_layer(float (*activation)(float), float (*derivative
 void create_filter_layer(Shape *filter_shape, Layer *layer) {
     Filter_layer *filter = malloc(sizeof(Filter_layer));
     create_matrix(filter_shape->rows, filter_shape->columns, &(filter->weights));
-    create_matrix(1, 1, &(filter->biases));
+    create_matrix(1, 1, &(filter->bias));
     randomize(-1, 1, filter->weights);
-    randomize(-1, 1, filter->biases);
+    randomize(-1, 1, filter->bias);
     layer->filter = filter;
     layer->type = FILTER_LAYER;
 }
@@ -68,7 +68,7 @@ void filter(Layer *layer, Matrix *input, Matrix **output) {
     layer->input = input;
     reshape(input, layer->input_shape);
     filter_matrix(input, filter->weights, &result);
-    add(result, filter->biases->data[0]);
+    add(result, filter->bias->data[0]);
     reshape(result, layer->output_shape);
     if(layer->output)
         free_matrix(layer->output);
@@ -86,10 +86,10 @@ void pool(Layer *layer, Matrix *input, Matrix **output) {
     create_matrix(input->shape->rows / pool->pooling_shape->rows, input->shape->columns / pool->pooling_shape->columns, &result);
     for(size_t i = 0; i < input->shape->rows; i += pool->pooling_shape->rows) {
         for(size_t j = 0; j < input->shape->columns; j += pool->pooling_shape->columns) {
-            float max;
-            for(size_t k = pool->pooling_shape->rows; k--;) {
-                for(size_t l = pool->pooling_shape->columns; l--;) {
-                    float value = input->data[(i + k) * input->shape->columns + j +l];
+            float max = 0;
+            for(size_t k = 0; k < pool->pooling_shape->rows; k++) {
+                for(size_t l = 0; l < pool->pooling_shape->columns; l++) {
+                    float value = input->data[(i + k) * input->shape->columns + j + l];
                     if(!max || max < value) {
                         max = value;
                     }
@@ -125,6 +125,59 @@ void update(Layer *layer, Matrix **error) {
     *error = new_error;
 }
 
+void update_filter(Layer *layer, Matrix **error) {
+    Filter_layer *filter = layer->filter;
+    Matrix *new_error;
+    Matrix *delta_W;
+    create_matrix(filter->weights->shape->rows, filter->weights->shape->columns, &delta_W);
+    set(0, delta_W);
+    float delta_b = 0;
+    
+    for(size_t i = 0; i < (*error)->shape->rows; i++) {
+        for(size_t j = 0; j < (*error)->shape->columns; j++) {
+            delta_b += (*error)->data[i * (*error)->shape->columns + j];
+            for(size_t k = 0; k < filter->weights->shape->rows; k++) {
+                for(size_t l = 0; l < filter->weights->shape->columns; l++) {
+                    delta_W->data[k * filter->weights->shape->columns + l] += (*error)->data[i * (*error)->shape->columns + j] * layer->input->data[(i + k) * layer->input_shape->columns + j + l];
+                }
+            }
+        }
+    }
+    
+    add(filter->bias, delta_b);
+    matrix_addition(delta_W, filter->weights);
+    
+    free_matrix(delta_W);
+    
+//    free_matrix(*error);
+//    *error = new_error;
+}
+
+void update_pool(Layer *layer, Matrix **error) {
+    Pooling_layer *pool = layer->pool;
+    Matrix *new_error;
+    Matrix *input = layer->input;
+    create_matrix(layer->input_shape->rows, layer->input_shape->columns, &new_error);
+    set(0, new_error);
+    reshape(*error, layer->output_shape);
+    for(size_t i = 0; i < input->shape->rows; i += pool->pooling_shape->rows) {
+        for(size_t j = 0; j < input->shape->columns; j += pool->pooling_shape->columns) {
+            for(size_t k = 0; k < pool->pooling_shape->rows; k++) {
+                for(size_t l = 0; l < pool->pooling_shape->columns; l++) {
+                    if(layer->input->data[(i + k) * input->shape->columns + j + l] == layer->output->data[(i / pool->pooling_shape->rows) * (input->shape->columns / pool->pooling_shape->columns) + (j / pool->pooling_shape->columns)]) {
+                        k = pool->pooling_shape->rows;
+                        l = pool->pooling_shape->columns;
+                        new_error->data[(i + k) * input->shape->columns + j + l] = (*error)->data[(i / pool->pooling_shape->rows) * (input->shape->columns / pool->pooling_shape->columns) + (j / pool->pooling_shape->columns)];
+                        
+                    }
+                }
+            }
+        }
+    }
+    free_matrix(*error);
+    *error = new_error;
+}
+
 void print_layer(const Layer *layer, const unsigned int show_values) {
     printf("Input shape: ");
     print_shape(layer->input_shape);
@@ -145,7 +198,7 @@ void print_layer(const Layer *layer, const unsigned int show_values) {
                     printf("Weights: \n");
                     print_matrix(layer->filter->weights);
                     printf("Biases: \n");
-                    print_matrix(layer->filter->biases);
+                    print_matrix(layer->filter->bias);
                 }
                 break;
             case POOLING_LAYER:
@@ -169,7 +222,7 @@ void free_layer(Layer *layer) {
             break;
         case FILTER_LAYER:
             free_matrix(layer->filter->weights);
-            free_matrix(layer->filter->biases);
+            free_matrix(layer->filter->bias);
             break;
         case POOLING_LAYER:
             free(layer->pool->pooling_shape);

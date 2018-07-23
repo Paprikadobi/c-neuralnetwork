@@ -97,9 +97,9 @@ void filter_matrix(const Matrix *matrix, const Matrix *filter, Matrix **created)
     create_matrix(matrix->shape->rows - filter->shape->rows, matrix->shape->columns - filter->shape->columns, &result);
     set(0, result);
     for(size_t i = 0; i < matrix->shape->rows - filter->shape->rows; i++)
-        for(size_t j = 0; j < matrix->shape->columns; j++)
-            for(size_t k = filter->shape->rows; k--;)
-                for(size_t l = filter->shape->columns; l--;)
+        for(size_t j = 0; j < matrix->shape->columns - filter->shape->columns; j++)
+            for(size_t k = 0; k < filter->shape->rows; k++)
+                for(size_t l = 0; l < filter->shape->columns; l++)
                     result->data[i * result->shape->columns + j] += matrix->data[(i + k) * matrix->shape->columns + j + l] * filter->data[k * filter->shape->columns + l];
     *created = result;
 }

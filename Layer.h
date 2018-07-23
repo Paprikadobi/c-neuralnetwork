@@ -16,7 +16,7 @@ typedef struct {
 
 typedef struct {
     Matrix *weights;
-    Matrix *biases;
+    Matrix *bias;
 } Filter_layer;
 
 typedef struct {
@@ -51,6 +51,10 @@ void filter(Layer *layer, Matrix *input, Matrix **output);
 void pool(Layer *layer, Matrix *input, Matrix **output);
 
 void update(Layer *layer, Matrix **error);
+
+void update_filter(Layer *layer, Matrix **error);
+
+void update_pool(Layer *layer, Matrix **error);
 
 void print_layer(const Layer *layer, const unsigned int show_values);
 

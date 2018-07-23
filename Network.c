@@ -51,8 +51,10 @@ void train(Network *network, const Data *training_data) {
                     update(network->layers[j], &guess_error);
                     break;
                 case FILTER_LAYER:
+                    update_filter(network->layers[j], &guess_error);
                     break;
                 case POOLING_LAYER:
+                    update_pool(network->layers[j], &guess_error);
                     break;
             }
         }
