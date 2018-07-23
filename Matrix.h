@@ -5,10 +5,19 @@
 #define min(a, b) (a < b ? a : b)
 
 typedef struct {
-    float *data;
     unsigned int rows;
     unsigned int columns;
+    unsigned int size;
+} Shape;
+
+typedef struct {
+    float *data;
+    Shape *shape;
 } Matrix;
+
+void create_shape(const unsigned int rows, const unsigned int columns, Shape **created);
+
+void print_shape(Shape *shape);
 
 void create_matrix(const unsigned int rows, const unsigned int columns, Matrix **created);
 
@@ -26,7 +35,7 @@ unsigned int matrix_mult(Matrix *a, const Matrix *b);
 
 unsigned int matrix_multiplication(const Matrix *a, const Matrix *b, Matrix **c);
 
-unsigned int reshape(Matrix *matrix, const unsigned int rows, const unsigned int columns);
+unsigned int reshape(Matrix *matrix, Shape *shape);
 
 void filter_matrix(const Matrix *matrix, const Matrix *filter, Matrix **created);
 
