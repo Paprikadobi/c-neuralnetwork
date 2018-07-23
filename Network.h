@@ -7,7 +7,7 @@ typedef struct {
     float learning_rate;
 } Network;
 
-void create_network(const unsigned int layers_number, const unsigned int *layers_neurons, const float learning_rate, Network **created);
+void create_network(const unsigned int layers_number, Layer **layers, const float learning_rate, Network **created);
 
 void network_feed_forward(const Network *network, Matrix *input, Matrix **output);
 

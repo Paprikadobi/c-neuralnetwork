@@ -1,20 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "ActivationFunctions.h"
 #include "Matrix.h"
 #include "Data.h"
 #include "Layer.h"
 #include "Network.h"
 
-void create_network(const unsigned int layers_number, const unsigned int *layers_neurons, const float learning_rate, Network **created) {
+void create_network(const unsigned int layers_number, Layer **layers, const float learning_rate, Network **created) {
     Network *network = malloc(sizeof(Network));
     network->layers_number = layers_number;
-    network->layers = malloc(sizeof(Layer) * layers_number);
+    network->layers = layers;
     network->learning_rate = learning_rate;
-    for(size_t i = layers_number; i--;) {
-        create_layer(layers_neurons[i], layers_neurons[i + 1], sigmoid, d_sigmoid, &(network->layers[i]));
-    }
     *created = network;
 }
 
@@ -23,7 +19,17 @@ void network_feed_forward(const Network *network, Matrix *input, Matrix **output
     Matrix *inp;
     copy(input, &inp);
     for(size_t i = 0; i < network->layers_number; i++) {
-        feed_forward(network->layers[i], inp, &tmp);
+        switch (network->layers[i]->type) {
+            case FULLY_CONNECTED_LAYER:
+                feed_forward(network->layers[i], inp, &tmp);
+                break;
+            case FILTER_LAYER:
+                filter(network->layers[i], inp, &tmp);
+                break;
+            case POOLING_LAYER:
+                pool(network->layers[i], inp, &tmp);
+                break;
+        }
         inp = tmp;
     }
     *output = tmp;
@@ -39,8 +45,17 @@ void train(Network *network, const Data *training_data) {
         multiply(guess_error, -1);
         matrix_addition(outputs[i], guess_error);
         multiply(guess_error, network->learning_rate);
-        for(size_t j = network->layers_number; j--;)
-            update(network->layers[j], &guess_error);
+        for(size_t j = network->layers_number; j--;) {
+            switch(network->layers[j]->type) {
+                case FULLY_CONNECTED_LAYER:
+                    update(network->layers[j], &guess_error);
+                    break;
+                case FILTER_LAYER:
+                    break;
+                case POOLING_LAYER:
+                    break;
+            }
+        }
         free_matrix(guess_error);
     }
     printf("Training ended\n");
@@ -49,7 +64,7 @@ void train(Network *network, const Data *training_data) {
 void print_network(const Network *network, const unsigned int show_values) {
     printf("Learning rate: %.3f\n\n", network->learning_rate);
     for(size_t i = 0; i < network->layers_number; i++) {
-        printf("Layer %zu: \n", i);
+        printf("Layer %zu: %s\n", i, layer_description[network->layers[i]->type]);
         print_layer(network->layers[i], show_values);
     }
 }
