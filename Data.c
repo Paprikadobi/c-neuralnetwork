@@ -10,8 +10,8 @@ void create_data(const unsigned int count, const unsigned int input_rows, float 
     data->x = malloc(sizeof(Matrix) * count);
     data->y = malloc(sizeof(Matrix) * count);
     for(size_t i = count; i--;) {
-        create_matrix(input_rows, 1, &(data->x[i]));
-        create_matrix(output_rows, 1, &(data->y[i]));
+        data->x[i] = create_matrix(create_shape(1, input_rows, 1));
+        data->y[i] = create_matrix(create_shape(1, output_rows, 1));
         data->x[i]->data = inputs[i];
         data->y[i]->data = outputs[i];
     }

@@ -24,6 +24,6 @@ float relu(const float x) {
     return max(0.0, x);
 }
 
-float relu_d(const float x) {
+float d_relu(const float x) {
     return x ? 1.0 : 0.0;
 }

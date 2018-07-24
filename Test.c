@@ -13,9 +13,9 @@ int main() {
 }
 
 void matrix_set_test() {
-    Matrix *a, *b;
-    create_matrix(3, 2, &a);
-    create_matrix(3, 2, &b);
+    Shape *shape = create_shape(1, 3, 2);
+    Matrix *a = create_matrix(shape);
+    Matrix *b = create_matrix(shape);
     
     float data[6] = {1, 1, 1, 1, 1, 1};
     set(1, a);
@@ -24,9 +24,9 @@ void matrix_set_test() {
 }
 
 void matrix_multiply_test() {
-    Matrix *a, *b;
-    create_matrix(3, 2, &a);
-    create_matrix(3, 2, &b);
+    Shape *shape = create_shape(1, 3, 2);
+    Matrix *a = create_matrix(shape);
+    Matrix *b = create_matrix(shape);
     
     float data_a[6] = {1, 1, 1, 1, 1, 1};
     float data_b[6] = {-1, -1, -1, -1, -1, -1};
@@ -39,22 +39,30 @@ void matrix_multiply_test() {
 
 void matrix_transpose_test() {
     Matrix *a, *b, *c;
-    create_matrix(3, 2, &a);
-    create_matrix(2, 3, &c);
+    Shape *shape_a, *shape_b;
+    shape_a = create_shape(1, 3, 2);
+    shape_b = create_shape(1, 2, 3);
+    a = create_matrix(shape_a);
+    c = create_matrix(shape_b);
     
-    float data[6] = {1, 1, 1, 1, 1, 1};
+    float data_a[6] = {1, 2, 3, 4, 5, 6};
+    float data_c[6] = {1, 3, 5, 2, 4, 6};
     
-    a->data = data;
-    c->data = data;
+    a->data = data_a;
+    c->data = data_c;
     transpose(a, &b);
     test(b, c, "Matrix transpose");
 }
 
 void matrix_multiplication_test() {
     Matrix *a, *b, *c, *d;
-    create_matrix(3, 2, &a);
-    create_matrix(2, 3, &b);
-    create_matrix(3, 3, &d);
+    Shape *shape_a, *shape_b, shape_d;
+    shape_a = create_shape(1, 3, 2);
+    shape_b = create_shape(1, 2, 3);
+    shape_d = create_shape(1, 3, 3);
+    a = create_matrix(shape_a);
+    b = create_matrix(shape_b);
+    d = create_matrix(shape_d);
     
     float data_a[6] = {1, 1, 1, 1, 1, 1};
     float data_b[6] = {-0.5, -0.5, -0.5, -0.5, -0.5, -0.5};

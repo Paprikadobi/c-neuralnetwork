@@ -11,6 +11,6 @@ float d_tanh(const float x);
 
 float relu(const float x);
 
-float relu_d(const float x);
+float d_relu(const float x);
 
 #endif
